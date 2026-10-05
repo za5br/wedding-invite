@@ -1,0 +1,1032 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>دعوة زفاف | Wedding invitation</title>
+<meta property="og:title" content="دعوة زفاف | Wedding invitation">
+<meta property="og:description" content="اضغط لتأكيد الحضور | Tap to RSVP">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
+<script src="config.js"></script>
+<style>
+:root{
+  --bg:#EDF0EC; --card:#FFFFFF; --ink:#2A1B2D; --muted:#6B626E; --line:#D7DBD3;
+  --gold:#9A7330; --gold-soft:#EFE5D2; --rose:#A9707A; --rose-soft:#F4E6E8;
+  --ok:#2E6A4E; --ok-soft:#E1EFE7; --amber:#8E6410; --amber-soft:#F6ECD6;
+  --bad:#963B3B; --bad-soft:#F5E3E3; --slate:#45577A; --slate-soft:#E3E8F1;
+  --grey-soft:#E7E8E4;
+  --display:"Amiri", "Times New Roman", serif;
+  --ui:"IBM Plex Sans Arabic", "Segoe UI", system-ui, -apple-system, sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#1B1420; --card:#251C2A; --ink:#F0E8EE; --muted:#B4A9B6; --line:#3B3040;
+    --gold:#D4B06C; --gold-soft:#3A3122; --rose:#D79AA4; --rose-soft:#3C2730;
+    --ok:#7CC7A0; --ok-soft:#1F3A2D; --amber:#E2B65C; --amber-soft:#3A2F17;
+    --bad:#E59A9A; --bad-soft:#402426; --slate:#A9B9DA; --slate-soft:#283247; --grey-soft:#302835;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1B1420; --card:#251C2A; --ink:#F0E8EE; --muted:#B4A9B6; --line:#3B3040;
+  --gold:#D4B06C; --gold-soft:#3A3122; --rose:#D79AA4; --rose-soft:#3C2730;
+  --ok:#7CC7A0; --ok-soft:#1F3A2D; --amber:#E2B65C; --amber-soft:#3A2F17;
+  --bad:#E59A9A; --bad-soft:#402426; --slate:#A9B9DA; --slate-soft:#283247; --grey-soft:#302835;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--ui);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+img,svg,canvas,video{max-width:100%}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.muted{color:var(--muted)}
+.wrap{max-width:1040px;margin:0 auto;padding:20px 16px 64px}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);background:var(--card);border-radius:10px;padding:9px 14px;cursor:pointer;font-weight:500;font-size:15px;text-decoration:none;white-space:nowrap;min-height:42px}
+.btn:hover{border-color:var(--gold)}
+.btn.primary{background:var(--ink);color:var(--card);border-color:var(--ink)}
+.btn.gold{background:var(--gold);color:#fff;border-color:var(--gold)}
+.btn.ghost{background:transparent;border-color:transparent}
+.btn.ghost:hover{background:var(--grey-soft)}
+.btn.sm{padding:6px 10px;min-height:36px;font-size:14px}
+.btn.icon{padding:0;width:40px;min-height:40px}
+.btn svg{width:18px;height:18px;flex:none}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+
+/* top bar */
+.top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:22px}
+.top h1{font-family:var(--display);font-weight:700;font-size:clamp(26px,4.4vw,38px);line-height:1.15;margin:0;flex:1;min-width:200px}
+.top h1 small{display:block;font-family:var(--ui);font-size:14px;font-weight:400;color:var(--muted);margin-top:2px}
+.top .actions{display:flex;gap:8px;flex-wrap:wrap}
+
+.notice{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:12px 14px;margin-bottom:16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;font-size:15px}
+.notice.gold{background:var(--gold-soft);border-color:transparent}
+
+/* overview */
+.overview{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:16px}
+.seatline{display:flex;gap:28px;flex-wrap:wrap;margin-bottom:14px}
+.seatline div{min-width:120px}
+.seatline b{display:block;font-family:var(--display);font-size:30px;line-height:1.1;font-weight:700}
+.seatline span{font-size:14px;color:var(--muted)}
+.bar{display:flex;height:8px;border-radius:99px;overflow:hidden;background:var(--grey-soft);margin-bottom:14px}
+.bar i{display:block;height:100%}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.chip{border:1px solid var(--line);background:transparent;border-radius:99px;padding:5px 12px;font-size:14px;cursor:pointer;white-space:nowrap;display:inline-flex;gap:6px;align-items:center}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--card);border-color:var(--ink)}
+.chip .dot{width:8px;height:8px;border-radius:50%}
+.chip em{font-style:normal;opacity:.7}
+
+.toolbar{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.search{flex:1;min-width:200px;position:relative}
+.search input{width:100%;border:1px solid var(--line);background:var(--card);border-radius:10px;padding:9px 14px;padding-inline-start:38px;min-height:42px}
+.search svg{position:absolute;inset-inline-start:12px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--muted)}
+
+/* list */
+.list{background:var(--card);border:1px solid var(--line);border-radius:16px}
+.row{display:grid;grid-template-columns:minmax(0,1fr) 92px 170px auto;gap:12px;align-items:center;padding:12px 16px;border-top:1px solid var(--line)}
+.row:first-child{border-top:0}
+.row .who b{font-weight:600;display:block;overflow-wrap:anywhere}
+.row .who span{font-size:13px;color:var(--muted)}
+.row .seats{font-variant-numeric:tabular-nums;font-size:15px}
+.row .seats small{color:var(--muted)}
+.row .acts{display:flex;gap:4px;justify-content:flex-end;align-items:center}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:99px;font-size:13px;font-weight:500;white-space:nowrap}
+.pill.draft{background:var(--grey-soft);color:var(--muted)}
+.pill.sent{background:var(--slate-soft);color:var(--slate)}
+.pill.viewed{background:var(--rose-soft);color:var(--rose)}
+.pill.confirmed{background:var(--ok-soft);color:var(--ok)}
+.pill.partial{background:var(--amber-soft);color:var(--amber)}
+.pill.declined{background:var(--bad-soft);color:var(--bad)}
+.pill.checkedin{background:var(--gold);color:#fff}
+.empty{padding:48px 20px;text-align:center}
+.empty h2{font-family:var(--display);font-size:26px;margin:0 0 6px}
+.empty p{margin:0 auto 18px;max-width:44ch;color:var(--muted)}
+@media (max-width:720px){
+  .row{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"who status" "seats acts"}
+  .row .who{grid-area:who}.row .st{grid-area:status;justify-self:end}
+  .row .seats{grid-area:seats}.row .acts{grid-area:acts}
+  .row .acts .lbl{display:none}
+}
+
+/* menu */
+details.menu{position:relative}
+details.menu summary{list-style:none}
+details.menu summary::-webkit-details-marker{display:none}
+.menu-pop{position:absolute;inset-inline-end:0;top:calc(100% + 4px);z-index:20;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:6px;min-width:220px;box-shadow:0 12px 32px rgba(30,15,35,.16)}
+.menu-pop button,.menu-pop a{display:flex;color:inherit;text-decoration:none;width:100%;gap:10px;align-items:center;border:0;background:none;padding:9px 10px;border-radius:8px;cursor:pointer;text-align:start;font-size:15px}
+.menu-pop button:hover,.menu-pop a:hover{background:var(--grey-soft)}
+.menu-pop button svg,.menu-pop a svg{width:17px;height:17px;color:var(--muted)}
+.menu-pop button.danger{color:var(--bad)}
+.menu-pop button.danger svg{color:var(--bad)}
+.menu-pop hr{border:0;border-top:1px solid var(--line);margin:4px 0}
+
+/* dialog */
+dialog{border:0;border-radius:18px;padding:0;background:var(--card);color:var(--ink);width:min(520px,calc(100% - 24px));max-height:calc(100% - 48px)}
+dialog::backdrop{background:rgba(25,12,30,.45)}
+.dlg{padding:22px}
+.dlg h2{font-family:var(--display);font-size:26px;margin:0 0 14px;line-height:1.2}
+.field{display:block;margin-bottom:14px}
+.field span{display:block;font-size:14px;font-weight:500;margin-bottom:5px}
+.field input,.field select,.field textarea{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:10px 12px;min-height:44px}
+.field small{display:block;color:var(--muted);font-size:13px;margin-top:4px}
+.dlg-acts{display:flex;gap:8px;justify-content:flex-end;margin-top:8px;flex-wrap:wrap}
+.drop{border:1.5px dashed var(--line);border-radius:12px;padding:22px;text-align:center;cursor:pointer;display:block}
+.drop:hover{border-color:var(--gold)}
+.q-card{border:1px solid var(--line);border-radius:14px;padding:16px;margin:12px 0;background:var(--bg)}
+.q-card b{font-family:var(--display);font-size:24px;display:block;line-height:1.2}
+.q-prog{height:6px;border-radius:99px;background:var(--grey-soft);overflow:hidden;margin-bottom:6px}
+.q-prog i{display:block;height:100%;background:var(--gold)}
+.q-msg{white-space:pre-wrap;font-size:13px;color:var(--muted);max-height:140px;overflow:auto;margin-top:8px}
+.wa-btn{background:#1F8F55;border-color:#1F8F55;color:#fff;width:100%;min-height:56px;font-size:17px;border-radius:14px}
+.report{font-size:14px;max-height:160px;overflow:auto;margin:10px 0;color:var(--muted)}
+
+.toast{position:fixed;inset-inline:0;bottom:calc(18px + env(safe-area-inset-bottom,0px));display:flex;justify-content:center;pointer-events:none;z-index:50}
+.toast div{background:var(--ink);color:var(--card);padding:10px 16px;border-radius:12px;font-size:15px;max-width:min(92vw,520px);box-shadow:0 10px 30px rgba(0,0,0,.25);opacity:0;transform:translateY(8px);transition:opacity .2s,transform .2s}
+.toast div.on{opacity:1;transform:none}
+
+/* ===== guest page ===== */
+.guest{max-width:480px;margin:0 auto;padding:16px 16px 48px}
+.g-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;min-height:40px}
+.arch{position:relative;background:var(--card);border-radius:240px 240px 18px 18px;padding:64px 26px 28px;text-align:center;border:1px solid var(--line)}
+.arch::before{content:"";position:absolute;inset:9px;border:1px solid var(--gold);border-radius:232px 232px 12px 12px;pointer-events:none;opacity:.7}
+.arch .names{font-family:var(--display);font-size:clamp(30px,8vw,40px);line-height:1.2;margin:0 0 10px;font-weight:700}
+.orn{display:flex;align-items:center;justify-content:center;gap:10px;color:var(--gold);margin:4px 0 16px}
+.orn i{display:block;width:56px;height:1px;background:currentColor}
+.orn b{width:7px;height:7px;transform:rotate(45deg);border:1px solid currentColor}
+.arch .dear{font-family:var(--display);font-size:24px;margin:0 0 4px}
+.arch .inv{margin:0 0 18px;color:var(--muted)}
+.facts{display:flex;justify-content:center;gap:0;margin:0;border-top:1px solid var(--line);padding-top:16px}
+.facts div{flex:1;padding:0 8px}
+.facts div+div{border-inline-start:1px solid var(--line)}
+.facts dt{font-size:13px;color:var(--muted)}
+.facts dd{margin:2px 0 0;font-weight:600;font-size:17px}
+.g-card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px;margin-top:14px}
+.g-card h2{font-size:18px;font-weight:600;margin:0 0 14px;line-height:1.4}
+.choice{display:grid;gap:10px}
+.choice .btn{min-height:56px;font-size:17px;border-radius:14px}
+.g-select{width:100%;min-height:56px;border:1px solid var(--line);border-radius:14px;padding:0 14px;background:var(--bg);font-size:17px;margin-bottom:12px}
+.big{width:100%;min-height:56px;font-size:17px;border-radius:14px}
+.done{text-align:center}
+.tick{width:60px;height:60px;margin:0 auto 8px;display:block}
+.tick circle{fill:none;stroke:var(--ok);stroke-width:2}
+.tick path{fill:none;stroke:var(--ok);stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:40;stroke-dashoffset:0}
+.animate .tick path{animation:draw .6s .15s ease-out both}
+.animate .qrbox{animation:rise .5s .45s ease-out both}
+@keyframes draw{from{stroke-dashoffset:40}}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}}
+@media (prefers-reduced-motion:reduce){.animate .tick path,.animate .qrbox{animation:none}}
+.done h2{font-family:var(--display);font-size:30px;margin:0;font-weight:700}
+.done p{margin:4px 0}
+.counts{display:flex;margin:16px 0;border:1px solid var(--line);border-radius:12px}
+.counts div{flex:1;padding:10px}
+.counts div+div{border-inline-start:1px solid var(--line)}
+.counts b{display:block;font-family:var(--display);font-size:28px;line-height:1.1}
+.counts span{font-size:13px;color:var(--muted)}
+.qrbox{margin-top:18px;padding-top:18px;border-top:1px solid var(--line)}
+.qrbox h3{font-family:var(--display);font-size:22px;margin:0}
+.qr{background:#fff;border-radius:14px;padding:14px;width:min(250px,80%);margin:12px auto;display:block;border:1px solid var(--line)}
+.qr svg{display:block;width:100%;height:auto}
+.qr-acts{display:grid;gap:8px;grid-template-columns:1fr 1fr}
+@media (max-width:380px){.qr-acts{grid-template-columns:1fr}}
+.g-foot{text-align:center;font-size:14px;color:var(--muted);margin-top:14px}
+.linkbtn{background:none;border:0;color:var(--gold);text-decoration:underline;cursor:pointer;padding:6px;font-weight:500}
+
+/* ===== scan / check-in ===== */
+.station{max-width:560px;margin:0 auto;padding:16px 16px 48px}
+.station h1{font-family:var(--display);font-size:30px;margin:6px 0 4px}
+.cam{position:relative;background:#120c15;border-radius:18px;overflow:hidden;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;margin:14px 0}
+.cam video{width:100%;height:100%;object-fit:cover}
+.cam .frame{position:absolute;inset:18%;border:3px solid rgba(255,255,255,.85);border-radius:18px}
+.cam p{color:#ddd;padding:24px;text-align:center;position:absolute}
+.manual{display:flex;gap:8px;margin-top:10px}
+.manual input{flex:1;border:1px solid var(--line);background:var(--card);border-radius:10px;padding:10px 12px;min-height:46px}
+.ci{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:22px;margin-top:14px}
+.ci .nm{font-family:var(--display);font-size:clamp(30px,7vw,40px);line-height:1.15;margin:0 0 4px;font-weight:700}
+.ci dl{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0}
+.ci dt{font-size:13px;color:var(--muted)}
+.ci dd{margin:0;font-size:20px;font-weight:600}
+.checkin-btn{width:100%;min-height:76px;font-size:22px;border-radius:16px}
+.already{background:var(--ok-soft);color:var(--ok);border-radius:16px;padding:18px;text-align:center}
+.already b{display:block;font-size:22px;margin-bottom:6px}
+.warn{background:var(--amber-soft);color:var(--amber);border-radius:12px;padding:10px 12px;margin-bottom:12px;font-size:15px}
+.loading{padding:80px 20px;text-align:center;color:var(--muted)}
+</style>
+</head>
+<body>
+<div id="app"><div class="loading">…</div></div>
+<div class="toast" aria-live="polite"><div id="toast"></div></div>
+<dialog id="dlg"></dialog>
+
+<script>
+"use strict";
+/* ---------- helpers ---------- */
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const TAB = Math.random().toString(36).slice(2);
+const ICON = {
+  copy:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg>',
+  msg:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8.5 8.5 0 0 1-12.6 7.4L3 21l1.6-5.2A8.5 8.5 0 1 1 21 12z"/></svg>',
+  link:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>',
+  qr:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3"/></svg>',
+  edit:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>',
+  trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>',
+  reset:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.4-5.7L4 8.5"/><path d="M4 4v4.5h4.5"/></svg>',
+  more:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>',
+  scan:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M4 12h16"/></svg>',
+  eye:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
+  dl:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>',
+  img:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></svg>',
+  gear:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>',
+  up:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V9M7 14l5-5 5 5M5 4h14"/></svg>',
+  plus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  search:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>',
+  back:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>',
+  undo:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/></svg>',
+  wa:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2z"/><path d="M8 9h8M8 13h5"/></svg>'
+};
+
+/* ---------- i18n ---------- */
+const T = {
+en:{appSub:"Wedding RSVP",namesMissing:"Add your names in Settings",scan:"Scan entry",settings:"Settings",addInv:"Add invitation",importList:"Import list",exportCsv:"Export CSV",
+search:"Search by name, ID or phone",all:"All",st_draft:"Draft",st_sent:"Sent",st_viewed:"Viewed",st_confirmed:"Confirmed",st_partial:"Partially confirmed",st_declined:"Declined",st_checkedin:"Checked in",
+invitations:"Invitations",reservedSeats:"Reserved seats",confirmedAtt:"Confirmed attendees",arrived:"Guests arrived",copyMsg:"Copy message",copyLink:"Copy link",openWa:"Send on WhatsApp",waOpenBtn:"Open WhatsApp",waNoPhone:"no phone saved, you will pick the contact in WhatsApp",waHelp:"If WhatsApp does not open, copy the message and paste it into the guest's chat.",downloadQr:"Download QR code",
+preview:"Preview guest page",checkinPage:"Open check-in",edit:"Edit invitation",resetRsvp:"Reset RSVP",undoCheckin:"Undo check-in",del:"Delete invitation",msgCopied:"Message copied. Paste it into WhatsApp.",linkCopied:"Link copied",
+noInv:"No invitations yet",noInvSub:"Add guests one by one, or import your whole list from Excel or CSV.",noMatch:"No invitations match this filter.",setupNote:"Set your names, RSVP deadline and link address before sending invitations.",openSettings:"Open settings",
+f_name:"Family / guest name",f_seats:"Reserved seats",f_phone:"Phone number (optional)",f_notes:"Notes",save:"Save",cancel:"Cancel",saved:"Saved",added:"Invitation added",deleted:"Invitation deleted",resetDone:"RSVP cleared",undoDone:"Check-in undone",
+s_coupleEn:"Your names in English",s_coupleAr:"Your names in Arabic",s_deadline:"RSVP deadline",s_base:"Invitation link address",s_baseHelp:"Each guest's link is this address followed by their private code, for example …/rsvp/abc123xyz",s_msgLang:"WhatsApp message language",both:"Arabic and English",arabic:"Arabic",english:"English",
+imp_title:"Import invitations",imp_help:"Columns: Family / Guest Name, Reserved Seats, Phone Number (optional), Notes. The first row should hold the column names.",imp_template:"Download template",imp_choose:"Choose an Excel or CSV file",imp_ready:"{n} invitations ready to import",imp_skipped:"{n} rows skipped",imp_go:"Import {n} invitations",imp_done:"{n} invitations imported",imp_working:"Importing {i} of {n}…",
+why_name:"name is missing",why_seats:"reserved seats must be a whole number, 1 or more",row:"Row",
+confirmDelete:"Delete the invitation for {name}? Their link and QR code will stop working.",confirmReset:"Clear the RSVP for {name}? They can reply again from the same link.",confirmUndo:"Undo check-in for {name}?",
+readOnly:"You can view these invitations but not change them.",writeErr:"Couldn't save. Check your connection and try again.",localNote:"Demo mode: invitations are saved in this browser only.",
+dear:"Dear {name}",inviteLine:"We are delighted to invite you to our wedding.",inviteOf:"We are delighted to invite you to the wedding of {c}.",replyBy:"Please reply by",
+g_yes:"✅ I will attend",g_no:"❌ I will not be attending",g_how:"How many of your reserved guests will attend?",g_choose:"Choose a number",g_zero:"0 — We will not be attending",g_send:"Send RSVP",
+g_thanks:"Thank you.",g_recorded:"Your RSVP has been recorded.",g_look:"We look forward to celebrating with you.",g_miss:"We will miss you. Thank you for letting us know.",
+g_qrTitle:"Your entry QR code",g_qrHelp:"Show this code at the wedding entrance.",g_saveImg:"Save as image",g_change:"Change my RSVP",g_keep:"Keep my current RSVP",
+g_canChange:"You can change your RSVP until {date}.",g_closed:"RSVPs closed on {date}.",g_closedNo:"RSVPs closed on {date}. Please contact the hosts directly.",
+g_notFound:"This invitation link is not valid.",g_notFoundSub:"Please check the link you received, or contact the hosts.",g_saveErr:"Your RSVP was not saved. Check your connection and try again.",
+g_preview:"Preview of {name}'s page. Replies made here are saved to their invitation.",back:"Dashboard",entryPass:"Entry pass",ofSeats:"{c} of {s} reserved seats",
+c_title:"Scan an entry code",c_help:"Point the camera at the guest's QR code.",c_cameraOff:"The camera isn't available here. Scan from a photo or type the invitation ID.",c_startCam:"Start camera",c_photo:"Scan from a photo",c_manual:"Invitation ID or code",c_find:"Find",
+c_notFound:"This code doesn't match any invitation.",c_noQr:"No QR code found in that photo.",c_status:"RSVP status",c_check:"Check-in",c_notYet:"Not checked in",c_checkIn:"Check in",c_already:"✅ Already checked in",c_done:"✅ Checked in",c_date:"Date",c_time:"Time",
+c_next:"Scan next guest",c_noRsvp:"This guest has not replied yet.",c_declined:"This guest declined the invitation.",noReply:"No reply",inviteId:"Invitation",loading:"Loading…",imp_none:"No rows could be read. Check that the first row has the column names and that every row has a name and a seat number.",signIn:"Sign in",signInTitle:"Organizer sign in",email:"Email",password:"Password",signInErr:"Email or password is incorrect.",signOut:"Sign out",notAdmin:"This account is not on the organizer list. Add its email to the admins table in Supabase.",g_loadErr:"The invitation could not be loaded. Check your connection and try again.",retry:"Try again",cfgMissing:"Setup is not finished: add your Supabase address and key to config.js, then upload the folder again.",sendInv:"Send invitations",q_title:"Send on WhatsApp",q_help:"Tap the green button, press send in WhatsApp, then come back here. The next guest will be ready.",q_open:"Open WhatsApp for this guest",q_pick:"Open WhatsApp and choose the contact",q_noPhone:"No phone number saved. You will pick the contact in WhatsApp.",q_skip:"Skip",q_of:"{i} of {n}",q_done:"All invitations have been sent",q_doneSub:"Statuses update automatically as guests open their links.",q_none:"Every invitation is already marked as sent.",q_close:"Done",q_showMsg:"Show message",q_resend:"Include already-sent invitations"},
+ar:{appSub:"تأكيد حضور الزفاف",namesMissing:"أضيفوا أسماءكم من الإعدادات",scan:"مسح الدخول",settings:"الإعدادات",addInv:"إضافة دعوة",importList:"استيراد القائمة",exportCsv:"تصدير CSV",
+search:"ابحث بالاسم أو رقم الدعوة أو الجوال",all:"الكل",st_draft:"مسودة",st_sent:"أُرسلت",st_viewed:"شوهدت",st_confirmed:"مؤكدة",st_partial:"مؤكدة جزئيًا",st_declined:"معتذر",st_checkedin:"تم الدخول",
+invitations:"الدعوات",reservedSeats:"المقاعد المحجوزة",confirmedAtt:"الحضور المؤكد",arrived:"الضيوف الواصلون",copyMsg:"نسخ الرسالة",copyLink:"نسخ الرابط",openWa:"إرسال عبر واتساب",waOpenBtn:"فتح واتساب",waNoPhone:"لا يوجد رقم محفوظ، ستختار جهة الاتصال في واتساب",waHelp:"إذا لم يفتح واتساب، انسخ الرسالة والصقها في محادثة الضيف.",downloadQr:"تنزيل رمز QR",
+preview:"معاينة صفحة الضيف",checkinPage:"فتح تسجيل الدخول",edit:"تعديل الدعوة",resetRsvp:"إعادة تعيين الرد",undoCheckin:"إلغاء تسجيل الدخول",del:"حذف الدعوة",msgCopied:"تم نسخ الرسالة. الصقها في واتساب.",linkCopied:"تم نسخ الرابط",
+noInv:"لا توجد دعوات بعد",noInvSub:"أضف الضيوف واحدًا تلو الآخر، أو استورد القائمة كاملة من Excel أو CSV.",noMatch:"لا توجد دعوات مطابقة لهذا التصنيف.",setupNote:"حدّدوا أسماءكم وآخر موعد للرد وعنوان الرابط قبل إرسال الدعوات.",openSettings:"فتح الإعدادات",
+f_name:"اسم العائلة / الضيف",f_seats:"المقاعد المحجوزة",f_phone:"رقم الجوال (اختياري)",f_notes:"ملاحظات",save:"حفظ",cancel:"إلغاء",saved:"تم الحفظ",added:"تمت إضافة الدعوة",deleted:"تم حذف الدعوة",resetDone:"تم مسح الرد",undoDone:"تم إلغاء تسجيل الدخول",
+s_coupleEn:"أسماؤكم بالإنجليزية",s_coupleAr:"أسماؤكم بالعربية",s_deadline:"آخر موعد للرد",s_base:"عنوان رابط الدعوة",s_baseHelp:"يتكوّن رابط كل ضيف من هذا العنوان متبوعًا برمزه الخاص، مثل ‎…/rsvp/abc123xyz",s_msgLang:"لغة رسالة واتساب",both:"العربية والإنجليزية",arabic:"العربية",english:"الإنجليزية",
+imp_title:"استيراد الدعوات",imp_help:"الأعمدة: اسم العائلة / الضيف، المقاعد المحجوزة، رقم الجوال (اختياري)، ملاحظات. يجب أن يحتوي الصف الأول على أسماء الأعمدة.",imp_template:"تنزيل النموذج",imp_choose:"اختر ملف Excel أو CSV",imp_ready:"{n} دعوة جاهزة للاستيراد",imp_skipped:"تم تجاوز {n} صفوف",imp_go:"استيراد {n} دعوة",imp_done:"تم استيراد {n} دعوة",imp_working:"جارٍ استيراد {i} من {n}…",
+why_name:"الاسم مفقود",why_seats:"يجب أن يكون عدد المقاعد رقمًا صحيحًا من 1 فأكثر",row:"الصف",
+confirmDelete:"حذف دعوة {name}؟ سيتوقف رابطها ورمز QR الخاص بها عن العمل.",confirmReset:"مسح رد {name}؟ يمكنهم الرد مجددًا من الرابط نفسه.",confirmUndo:"إلغاء تسجيل دخول {name}؟",
+readOnly:"يمكنك عرض الدعوات دون تعديلها.",writeErr:"تعذّر الحفظ. تحقق من الاتصال وحاول مجددًا.",localNote:"وضع تجريبي: الدعوات محفوظة في هذا المتصفح فقط.",
+dear:"{name} الكرام",inviteLine:"يسعدنا دعوتكم لحضور حفل زفافنا.",inviteOf:"يسعدنا دعوتكم لحضور حفل زفاف {c}.",replyBy:"نأمل الرد قبل",
+g_yes:"✅ سأحضر",g_no:"❌ لن أتمكن من الحضور",g_how:"كم عدد الحضور من ضيوفكم المحجوزين؟",g_choose:"اختر العدد",g_zero:"0 — لن نتمكن من الحضور",g_send:"إرسال الرد",
+g_thanks:"شكرًا لكم.",g_recorded:"تم تسجيل ردكم.",g_look:"نتطلع للاحتفال معكم.",g_miss:"سنفتقدكم، ونشكركم على إبلاغنا.",
+g_qrTitle:"رمز الدخول الخاص بكم",g_qrHelp:"يُرجى إبراز هذا الرمز عند مدخل الحفل.",g_saveImg:"حفظ كصورة",g_change:"تعديل ردي",g_keep:"الإبقاء على ردي الحالي",
+g_canChange:"يمكنكم تعديل ردكم حتى {date}.",g_closed:"انتهى موعد الرد في {date}.",g_closedNo:"انتهى موعد الرد في {date}. يُرجى التواصل مع أصحاب الدعوة مباشرة.",
+g_notFound:"رابط الدعوة غير صالح.",g_notFoundSub:"يُرجى التحقق من الرابط المرسل إليكم أو التواصل مع أصحاب الدعوة.",g_saveErr:"لم يُحفظ ردكم. تحقق من الاتصال وحاول مجددًا.",
+g_preview:"معاينة صفحة {name}. الردود هنا تُحفظ في دعوتهم.",back:"لوحة التحكم",entryPass:"بطاقة الدخول",ofSeats:"{c} من {s} مقاعد محجوزة",
+c_title:"امسح رمز الدخول",c_help:"وجّه الكاميرا إلى رمز QR الخاص بالضيف.",c_cameraOff:"الكاميرا غير متاحة هنا. امسح من صورة أو اكتب رقم الدعوة.",c_startCam:"تشغيل الكاميرا",c_photo:"المسح من صورة",c_manual:"رقم الدعوة أو الرمز",c_find:"بحث",
+c_notFound:"هذا الرمز لا يطابق أي دعوة.",c_noQr:"لم يُعثر على رمز QR في الصورة.",c_status:"حالة الرد",c_check:"الدخول",c_notYet:"لم يسجّل الدخول",c_checkIn:"تسجيل الدخول",c_already:"✅ تم تسجيل الدخول مسبقًا",c_done:"✅ تم تسجيل الدخول",c_date:"التاريخ",c_time:"الوقت",
+c_next:"مسح الضيف التالي",c_noRsvp:"لم يرد هذا الضيف بعد.",c_declined:"اعتذر هذا الضيف عن الحضور.",noReply:"لا يوجد رد",inviteId:"الدعوة",loading:"جارٍ التحميل…",imp_none:"تعذّرت قراءة أي صف. تأكد أن الصف الأول يحتوي أسماء الأعمدة وأن كل صف فيه اسم وعدد مقاعد.",signIn:"تسجيل الدخول",signInTitle:"دخول المنظِّم",email:"البريد الإلكتروني",password:"كلمة المرور",signInErr:"البريد الإلكتروني أو كلمة المرور غير صحيحة.",signOut:"تسجيل الخروج",notAdmin:"هذا الحساب ليس ضمن قائمة المنظمين. أضف بريده إلى جدول admins في Supabase.",g_loadErr:"تعذّر تحميل الدعوة. تحقق من الاتصال وحاول مجددًا.",retry:"إعادة المحاولة",cfgMissing:"الإعداد غير مكتمل: أضف عنوان Supabase والمفتاح في config.js ثم ارفع المجلد مجددًا.",sendInv:"إرسال الدعوات",q_title:"الإرسال عبر واتساب",q_help:"اضغط الزر الأخضر، ثم اضغط إرسال في واتساب، وعُد إلى هنا. سيكون الضيف التالي جاهزًا.",q_open:"فتح واتساب لهذا الضيف",q_pick:"فتح واتساب واختيار جهة الاتصال",q_noPhone:"لا يوجد رقم جوال محفوظ. ستختار جهة الاتصال في واتساب.",q_skip:"تخطي",q_of:"{i} من {n}",q_done:"تم إرسال جميع الدعوات",q_doneSub:"تتحدث الحالات تلقائيًا عند فتح الضيوف لروابطهم.",q_none:"جميع الدعوات مُعلَّمة كمُرسلة.",q_close:"تم",q_showMsg:"عرض الرسالة",q_resend:"تضمين الدعوات المرسلة سابقًا"}
+};
+let LANG = (() => { try { const l = localStorage.getItem("rsvp-lang"); if (l) return l; } catch (e) {} return (navigator.language || "").startsWith("ar") ? "ar" : "en"; })();
+const t = (k, v = {}) => (T[LANG][k] ?? T.en[k] ?? k).replace(/\{(\w+)\}/g, (_, x) => v[x] ?? "");
+function setLang(l) { LANG = l; try { localStorage.setItem("rsvp-lang", l); } catch (e) {} applyDir(); mount(); }
+function applyDir() { document.documentElement.lang = LANG; document.documentElement.dir = LANG === "ar" ? "rtl" : "ltr"; }
+const langBtn = () => `<button class="btn ghost sm" data-act="lang">${LANG === "ar" ? "English" : "العربية"}</button>`;
+const locale = l => l === "ar" ? "ar-SA-u-ca-gregory" : "en-GB";
+function fmtDate(iso, l = LANG, withTime = true) {
+  if (!iso) return ""; const d = new Date(iso); if (isNaN(d)) return "";
+  const o = { day: "numeric", month: "long", year: "numeric" }; if (withTime) Object.assign(o, { hour: "numeric", minute: "2-digit" });
+  return new Intl.DateTimeFormat(locale(l), o).format(d);
+}
+const fmtDay = iso => new Intl.DateTimeFormat(locale(LANG), { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date(iso));
+const fmtTime = iso => new Intl.DateTimeFormat(locale(LANG), { hour: "numeric", minute: "2-digit", second: "2-digit" }).format(new Date(iso));
+
+/* ---------- toast & dialogs ---------- */
+let toastTimer;
+function toast(msg) { const el = $("#toast"); el.textContent = msg; el.classList.add("on"); clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove("on"), 2800); }
+const dlg = $("#dlg");
+function openDialog(html, onBind) { dlg.innerHTML = `<div class="dlg">${html}</div>`; if (!dlg.open) dlg.showModal(); onBind && onBind(dlg); }
+function closeDialog() { if (dlg.open) dlg.close(); }
+dlg.addEventListener("click", e => { if (e.target === dlg) closeDialog(); });
+function confirmDialog(text, okLabel, danger) {
+  return new Promise(res => {
+    openDialog(`<p style="font-size:17px;margin:0 0 18px">${esc(text)}</p><div class="dlg-acts"><button class="btn" data-x="no">${t("cancel")}</button><button class="btn ${danger ? "gold" : "primary"}" data-x="yes" ${danger ? 'style="background:var(--bad);border-color:var(--bad)"' : ""}>${esc(okLabel)}</button></div>`, d => {
+      const done = v => { d.removeEventListener("close", onClose); closeDialog(); res(v); };
+      const onClose = () => res(false);
+      d.addEventListener("close", onClose, { once: true });
+      $('[data-x="no"]', d).onclick = () => done(false);
+      $('[data-x="yes"]', d).onclick = () => done(true);
+    });
+  });
+}
+
+/* ---------- data layer: Supabase ---------- */
+const CFG = window.RSVP_CONFIG || {};
+const DEFAULT_SETTINGS = { coupleEn: "", coupleAr: "", deadline: "", baseUrl: "", msgLang: "both" };
+const S = { mode: "loading", sb: null, session: null, invites: new Map(), settings: { ...DEFAULT_SETTINGS }, allLoaded: false, oneLoaded: {}, guestErr: {}, canWrite: true, notAdmin: false, subs: {} };
+const pad2 = n => String(n).padStart(2, "0");
+function toLocalInput(iso) { if (!iso) return ""; const d = new Date(iso); if (isNaN(d)) return ""; return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}T${pad2(d.getHours())}:${pad2(d.getMinutes())}`; }
+const fromRow = r => ({ token: r.token, id: r.inv_id, name: r.name, seats: r.seats, phone: r.phone || "", notes: r.notes || "", createdAt: r.created_at, sentAt: r.sent_at, viewedAt: r.viewed_at, rsvp: r.rsvp_count == null ? null : { count: r.rsvp_count, at: r.rsvp_at }, checkedInAt: r.checked_in_at });
+const COLS = { token: "token", id: "inv_id", name: "name", seats: "seats", phone: "phone", notes: "notes", createdAt: "created_at", sentAt: "sent_at", viewedAt: "viewed_at", checkedInAt: "checked_in_at" };
+function toRow(p) { const o = {}; for (const k in p) { if (k === "rsvp") { o.rsvp_count = p.rsvp ? p.rsvp.count : null; o.rsvp_at = p.rsvp ? p.rsvp.at : null; } else if (COLS[k]) o[COLS[k]] = p[k]; } return o; }
+const settingsFrom = r => ({ coupleEn: r.couple_en || "", coupleAr: r.couple_ar || "", deadline: toLocalInput(r.deadline), baseUrl: r.base_url || "", msgLang: r.msg_lang || "both" });
+
+function atobSafe(s) { try { return atob((s || "").replace(/-/g, "+").replace(/_/g, "/")); } catch (e) { return ""; } }
+async function init() {
+  applyDir();
+  let why = "";
+  if (!window.RSVP_CONFIG) why = "config.js was not found next to index.html, or it has a typo (check for curly quotes “ ”). Open " + pageBase() + "config.js to see what the site is loading.";
+  else if (/PASTE_/.test(String(CFG.supabaseUrl) + String(CFG.supabaseKey))) why = "config.js still contains the PASTE_… placeholder text. Edit it on GitHub and paste your Project URL and Publishable key.";
+  else if (!/^https:\/\/[a-z0-9-]+\.supabase\.(co|in)\/?$/i.test(String(CFG.supabaseUrl || "").trim())) why = "The supabaseUrl in config.js does not look right. It should look like https://abcdefgh.supabase.co with nothing after .co.";
+  else if (!CFG.supabaseKey || String(CFG.supabaseKey).length < 20) why = "The supabaseKey in config.js is empty or too short. Copy the full Publishable (or anon public) key.";
+  else if (/^sb_secret_/.test(CFG.supabaseKey) || /service_role/.test(atobSafe(String(CFG.supabaseKey).split(".")[1]))) why = "config.js contains your SECRET key. Replace it with the Publishable (or anon public) key, and rotate the secret key in Supabase.";
+  else if (!window.supabase) why = "The Supabase library could not load. Check your internet connection and refresh.";
+  if (why) {
+    app.innerHTML = `<main class="guest"><section class="arch"><p class="dear">${t("cfgMissing").split(":")[0]}</p><p class="inv" dir="ltr" style="text-align:left">${esc(why)}</p></section></main>`; return;
+  }
+  S.sb = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseKey);
+  S.mode = "db";
+  try { const { data } = await S.sb.auth.getSession(); S.session = data.session; } catch (e) {}
+  S.sb.auth.onAuthStateChange((ev, session) => {
+    const had = !!S.session; S.session = session;
+    if (!!session !== had) { resetAdminData(); mount(); }
+  });
+  mount();
+}
+async function loadAll() {
+  const { data, error } = await S.sb.from("invites").select("*").order("inv_id");
+  if (!error) S.invites = new Map(data.map(r => [r.token, fromRow(r)]));
+  S.allLoaded = true; refresh();
+}
+async function loadSettings() {
+  const { data } = await S.sb.from("settings").select("*").eq("id", 1).maybeSingle();
+  if (data) S.settings = settingsFrom(data); refresh();
+}
+function ensureAll() {
+  if (S.subs.all || !S.session) return; S.subs.all = true;
+  S.sb.rpc("is_admin").then(({ data }) => { S.notAdmin = data !== true; S.canWrite = data === true; refresh(); });
+  loadSettings(); loadAll();
+  S.subs.ch = S.sb.channel("invites-live").on("postgres_changes", { event: "*", schema: "public", table: "invites" }, () => { clearTimeout(S.subs.t); S.subs.t = setTimeout(loadAll, 400); }).subscribe();
+  S.subs.poll = setInterval(() => { if (!document.hidden) loadAll(); }, 30000);
+}
+function resetAdminData() { if (S.subs.ch) S.sb.removeChannel(S.subs.ch); clearInterval(S.subs.poll); S.subs = {}; S.invites = new Map(); S.allLoaded = false; S.notAdmin = false; }
+function setGuestData(token, data) {
+  if (data && data.invite) {
+    S.invites.set(token, fromRow(data.invite));
+    S.settings = { ...S.settings, coupleEn: data.couple_en || "", coupleAr: data.couple_ar || "", deadline: toLocalInput(data.deadline) };
+  } else S.invites.delete(token);
+}
+async function loadGuest(token, mark) {
+  S.guestErr[token] = false;
+  const { data, error } = await S.sb.rpc("get_invitation", { p_token: token, p_mark: mark });
+  if (error) S.guestErr[token] = true; else setGuestData(token, data);
+  S.oneLoaded[token] = true; refresh();
+}
+function writeFailed(e) { console.error(e); toast(t("writeErr")); }
+async function putInvite(inv) { const { error } = await S.sb.from("invites").insert(toRow(inv)); if (error) throw error; S.invites.set(inv.token, inv); refresh(); }
+async function putInvites(list, onProgress) {
+  for (let i = 0; i < list.length; i += 200) {
+    const chunk = list.slice(i, i + 200), { error } = await S.sb.from("invites").insert(chunk.map(toRow)); if (error) throw error;
+    chunk.forEach(x => S.invites.set(x.token, x)); onProgress && onProgress(Math.min(i + 200, list.length));
+  }
+  refresh();
+}
+async function patchInvite(token, patch) {
+  const { error } = await S.sb.from("invites").update(toRow(patch)).eq("token", token); if (error) throw error;
+  const cur = S.invites.get(token); if (cur) { S.invites.set(token, { ...cur, ...patch }); refresh(); }
+}
+async function removeInvite(token) { const { error } = await S.sb.from("invites").delete().eq("token", token); if (error) throw error; S.invites.delete(token); refresh(); }
+async function putSettings(s) {
+  const { error } = await S.sb.from("settings").upsert({ id: 1, couple_en: s.coupleEn, couple_ar: s.coupleAr, deadline: s.deadline ? new Date(s.deadline).toISOString() : null, base_url: s.baseUrl, msg_lang: s.msgLang });
+  if (error) throw error; S.settings = s; refresh();
+}
+
+/* ---------- domain ---------- */
+const STATUSES = ["draft", "sent", "viewed", "confirmed", "partial", "declined", "checkedin"];
+const STATUS_COLOR = { draft: "var(--line)", sent: "var(--slate)", viewed: "var(--rose)", confirmed: "var(--ok)", partial: "var(--amber)", declined: "var(--bad)", checkedin: "var(--gold)" };
+function statusOf(inv) {
+  if (inv.checkedInAt) return "checkedin";
+  const r = inv.rsvp;
+  if (r && typeof r.count === "number") { if (r.count === 0) return "declined"; if (r.count < inv.seats) return "partial"; return "confirmed"; }
+  if (inv.viewedAt) return "viewed";
+  if (inv.sentAt) return "sent";
+  return "draft";
+}
+const attending = inv => (inv.rsvp && typeof inv.rsvp.count === "number") ? inv.rsvp.count : null;
+const pill = st => `<span class="pill ${st}">${esc(t("st_" + st))}</span>`;
+function newToken() { const a = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789"; const b = new Uint8Array(20); crypto.getRandomValues(b); return Array.from(b, x => a[x % a.length]).join(""); }
+function nextIdNum() { let m = 0; S.invites.forEach(i => { const n = parseInt(String(i.id || "").replace(/\D/g, ""), 10); if (n > m) m = n; }); return m + 1; }
+const fmtId = n => "INV-" + String(n).padStart(4, "0");
+const pageBase = () => location.origin + location.pathname.replace(/[^\/]*$/, "");
+const linkFor = inv => S.settings.baseUrl ? S.settings.baseUrl.replace(/\/+$/, "") + "/" + inv.token : pageBase() + "?i=" + inv.token;
+const deadlinePassed = () => !!S.settings.deadline && Date.now() > new Date(S.settings.deadline).getTime();
+function messageFor(inv) {
+  const s = S.settings, link = linkFor(inv);
+  const ar = [`${inv.name} الكرام،`, "", s.coupleAr ? `يسعدنا دعوتكم لحضور حفل زفاف ${s.coupleAr}.` : "يسعدنا دعوتكم لحضور حفل زفافنا.", "", `عدد المقاعد المحجوزة: ${inv.seats}`];
+  if (s.deadline) ar.push(`نأمل تأكيد الحضور قبل ${fmtDate(s.deadline, "ar")}.`);
+  const en = [`Dear ${inv.name},`, "", s.coupleEn ? `We are delighted to invite you to the wedding of ${s.coupleEn}.` : "We are delighted to invite you to our wedding.", "", `Reserved seats: ${inv.seats}`];
+  if (s.deadline) en.push(`Please RSVP by ${fmtDate(s.deadline, "en")}.`);
+  let body;
+  if (s.msgLang === "ar") body = [...ar, "", "لتأكيد الحضور:", link];
+  else if (s.msgLang === "en") body = [...en, "", "RSVP here:", link];
+  else body = [...ar, "", "———", "", ...en, "", "لتأكيد الحضور | RSVP:", link];
+  return body.join("\n");
+}
+function waNumber(p) {
+  let d = String(p || "").replace(/\D/g, ""); if (!d) return "";
+  if (d.startsWith("00")) d = d.slice(2);
+  if (d.length === 10 && d.startsWith("05")) d = "966" + d.slice(1);
+  if (d.length === 9 && d.startsWith("5")) d = "966" + d;
+  return d;
+}
+function waLink(inv) {
+  const n = waNumber(inv.phone), txt = encodeURIComponent(messageFor(inv));
+  return "https://api.whatsapp.com/send?" + (n ? "phone=" + n + "&" : "") + "text=" + txt;
+}
+async function copyText(text) {
+  try { await navigator.clipboard.writeText(text); return true; } catch (e) {}
+  const ta = document.createElement("textarea"); ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select();
+  let ok = false; try { ok = document.execCommand("copy"); } catch (e) {} ta.remove(); return ok;
+}
+
+/* ---------- QR ---------- */
+function qrModel(text) { const q = qrcode(0, "M"); q.addData(text); q.make(); return q; }
+function qrSvg(text) {
+  const q = qrModel(text), n = q.getModuleCount(), m = 4, size = n + m * 2; let d = "";
+  for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (q.isDark(r, c)) d += `M${c + m} ${r + m}h1v1h-1z`;
+  return `<svg viewBox="0 0 ${size} ${size}" shape-rendering="crispEdges" role="img" aria-label="QR"><rect width="${size}" height="${size}" fill="#fff"/><path d="${d}" fill="#1E1420"/></svg>`;
+}
+function drawQr(ctx, text, x, y, px) {
+  const q = qrModel(text), n = q.getModuleCount(), cell = Math.floor(px / n), off = Math.floor((px - cell * n) / 2);
+  ctx.fillStyle = "#fff"; ctx.fillRect(x, y, px, px); ctx.fillStyle = "#1E1420";
+  for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (q.isDark(r, c)) ctx.fillRect(x + off + c * cell, y + off + r * cell, cell, cell);
+}
+const toBlob = cv => new Promise(r => cv.toBlob(r, "image/png"));
+async function qrPngBlob(inv) {
+  const cv = document.createElement("canvas"), size = 1024, pad = 80; cv.width = cv.height = size + pad * 2;
+  const ctx = cv.getContext("2d"); ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, cv.width, cv.height); drawQr(ctx, linkFor(inv), pad, pad, size);
+  return toBlob(cv);
+}
+async function passPngBlob(inv) {
+  try { await Promise.all([document.fonts.load('700 64px "Amiri"'), document.fonts.load('500 36px "IBM Plex Sans Arabic"')]); } catch (e) {}
+  const W = 1080, H = 1500, cv = document.createElement("canvas"); cv.width = W; cv.height = H; const ctx = cv.getContext("2d");
+  ctx.fillStyle = "#EDF0EC"; ctx.fillRect(0, 0, W, H);
+  const arch = (x, y, w, h, r) => { ctx.beginPath(); ctx.moveTo(x, y + h); ctx.lineTo(x, y + w / 2); ctx.arc(x + w / 2, y + w / 2, w / 2, Math.PI, 0); ctx.lineTo(x + w, y + h - r); ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h); ctx.lineTo(x + r, y + h); ctx.quadraticCurveTo(x, y + h, x, y + h - r); ctx.closePath(); };
+  arch(70, 60, W - 140, H - 120, 30); ctx.fillStyle = "#fff"; ctx.fill();
+  arch(92, 82, W - 184, H - 164, 20); ctx.strokeStyle = "#9A7330"; ctx.lineWidth = 2; ctx.stroke();
+  ctx.textAlign = "center"; ctx.direction = LANG === "ar" ? "rtl" : "ltr"; ctx.fillStyle = "#2A1B2D";
+  const couple = (LANG === "ar" ? S.settings.coupleAr : S.settings.coupleEn) || S.settings.coupleEn || S.settings.coupleAr || "";
+  ctx.font = '700 66px "Amiri", serif'; if (couple) ctx.fillText(couple, W / 2, 370);
+  ctx.fillStyle = "#9A7330"; ctx.font = '500 34px "IBM Plex Sans Arabic", sans-serif'; ctx.fillText(t("entryPass"), W / 2, 440);
+  ctx.fillStyle = "#2A1B2D"; ctx.font = '700 50px "Amiri", serif'; ctx.fillText(inv.name, W / 2, 530);
+  ctx.fillStyle = "#6B626E"; ctx.font = '400 32px "IBM Plex Sans Arabic", sans-serif'; ctx.fillText(t("ofSeats", { c: attending(inv) ?? 0, s: inv.seats }), W / 2, 585);
+  drawQr(ctx, linkFor(inv), (W - 600) / 2, 650, 600);
+  ctx.fillStyle = "#6B626E"; ctx.font = '400 30px "IBM Plex Sans Arabic", sans-serif'; ctx.fillText(t("g_qrHelp"), W / 2, 1320); ctx.fillText(inv.id, W / 2, 1370);
+  return toBlob(cv);
+}
+async function deliver(filename, blob) {
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+}
+
+/* ---------- router ---------- */
+function route() {
+  const qi = new URLSearchParams(location.search).get("i");
+  if (qi) return { name: "guest", token: qi, preview: false };
+  const m = location.pathname.match(/\/rsvp\/([^\/?#]+)/);
+  if (m) return { name: "guest", token: decodeURIComponent(m[1]), preview: false };
+  const p = location.hash.replace(/^#\/?/, "").split("/");
+  if (p[0] === "preview" && p[1]) return { name: "guest", token: p[1], preview: true };
+  if (p[0] === "scan") return { name: "scan" };
+  if (p[0] === "checkin" && p[1]) return { name: "checkin", token: p[1] };
+  return { name: "admin" };
+}
+let view = null;
+function mount() {
+  if (S.mode === "loading") return;
+  if (view && view.unmount) view.unmount();
+  closeDialog();
+  const r = route();
+  view = r.name === "guest" ? GuestView(r) : !S.session ? LoginView() : r.name === "scan" ? ScanView() : r.name === "checkin" ? CheckinView(r) : AdminView();
+  view.mount(); window.scrollTo(0, 0);
+}
+function refresh() { if (view && view.update) view.update(); else if (S.mode !== "loading" && !view) mount(); }
+window.addEventListener("hashchange", mount);
+document.addEventListener("click", e => {
+  if (e.target.closest('[data-act="lang"]')) { setLang(LANG === "ar" ? "en" : "ar"); return; }
+  document.querySelectorAll("details.menu[open]").forEach(d => { if (!d.contains(e.target)) d.removeAttribute("open"); });
+});
+const app = $("#app");
+
+/* ======================= LOGIN ======================= */
+function LoginView() {
+  function mount() {
+    app.innerHTML = `<main class="guest"><div class="g-top"><span></span>${langBtn()}</div><section class="arch">
+      <p class="names" style="font-size:30px">${t("signInTitle")}</p><div class="orn" aria-hidden="true"><i></i><b></b><i></i></div>
+      <form id="lf" style="text-align:start">
+        <label class="field"><span>${t("email")}</span><input name="email" type="email" dir="ltr" required autocomplete="username"></label>
+        <label class="field"><span>${t("password")}</span><input name="password" type="password" dir="ltr" required autocomplete="current-password"></label>
+        <p id="lerr" style="color:var(--bad);margin:0 0 10px;font-size:15px"></p>
+        <button class="btn primary big">${t("signIn")}</button></form></section></main>`;
+    $("#lf").onsubmit = async e => {
+      e.preventDefault(); const fd = new FormData(e.target), b = $("button", e.target); b.disabled = true; $("#lerr").textContent = "";
+      const { error } = await S.sb.auth.signInWithPassword({ email: String(fd.get("email")).trim(), password: String(fd.get("password")) });
+      if (error) { $("#lerr").textContent = t("signInErr"); b.disabled = false; }
+    };
+  }
+  return { mount, update() {} };
+}
+
+/* ======================= ADMIN ======================= */
+function AdminView() {
+  let filter = "all", q = "";
+  function mount() {
+    if (S.subs.all) loadAll();
+    ensureAll();
+    app.innerHTML = `<div class="wrap">
+      <header class="top"><h1 id="a-title"></h1><div class="actions">
+        ${langBtn()}
+        <button class="btn ghost sm" data-a="signout">${t("signOut")}</button>
+        <button class="btn icon" data-a="settings" title="${t("settings")}" aria-label="${t("settings")}">${ICON.gear}</button>
+        <a class="btn primary" href="#/scan">${ICON.scan}${t("scan")}</a></div></header>
+      <div id="a-notes"></div>
+      <section class="overview" id="a-over"></section>
+      <div class="toolbar">
+        <label class="search">${ICON.search}<span class="sr">${t("search")}</span><input id="a-q" type="search" placeholder="${t("search")}" autocomplete="off"></label>
+        <button class="btn" data-a="import">${ICON.up}${t("importList")}</button>
+        <button class="btn" data-a="add">${ICON.plus}${t("addInv")}</button>
+        <button class="btn gold" data-a="send" id="a-send">${ICON.wa}${t("sendInv")}</button>
+      </div>
+      <section class="list" id="a-list"></section>
+      <p style="text-align:end;margin-top:10px"><button class="btn ghost sm" data-a="export">${ICON.dl}${t("exportCsv")}</button></p>
+    </div>`;
+    $("#a-q").addEventListener("input", e => { q = e.target.value.trim().toLowerCase(); renderList(); });
+    app.addEventListener("click", onClick);
+    update();
+  }
+  function unmount() { app.removeEventListener("click", onClick); }
+  function update() {
+    if (!$("#a-title")) return;
+    const s = S.settings, couple = (LANG === "ar" ? s.coupleAr || s.coupleEn : s.coupleEn || s.coupleAr);
+    $("#a-title").innerHTML = `${couple ? esc(couple) : `<span class="muted" style="font-weight:400">${t("namesMissing")}</span>`}<small>${t("appSub")}${s.deadline ? " – " + esc(t("replyBy")) + " " + esc(fmtDate(s.deadline)) : ""}</small>`;
+    let notes = "";
+    if (S.notAdmin) notes += `<div class="notice">${esc(t("notAdmin"))}</div>`;
+        if ((!s.deadline || !s.coupleEn && !s.coupleAr) && S.canWrite) notes += `<div class="notice gold"><span style="flex:1;min-width:200px">${t("setupNote")}</span><button class="btn sm" data-a="settings">${t("openSettings")}</button></div>`;
+    $("#a-notes").innerHTML = notes;
+    renderOverview(); renderList();
+    const sb = $("#a-send"); if (sb) { const n = [...S.invites.values()].filter(i => !i.sentAt).length; sb.innerHTML = ICON.wa + esc(t("sendInv")) + (n ? ` <em style="font-style:normal;opacity:.85">(${n})</em>` : ""); }
+  }
+  function renderOverview() {
+    if (!S.allLoaded) { $("#a-over").innerHTML = `<div class="muted">${t("loading")}</div>`; return; }
+    const all = [...S.invites.values()], counts = {}; STATUSES.forEach(x => counts[x] = 0);
+    let seats = 0, conf = 0, arrived = 0;
+    all.forEach(i => { const st = statusOf(i); counts[st]++; seats += +i.seats || 0; const a = attending(i) || 0; conf += a; if (i.checkedInAt) arrived += a || 0; });
+    const total = all.length || 1;
+    $("#a-over").innerHTML = `
+      <div class="seatline">
+        <div><b>${all.length}</b><span>${t("invitations")}</span></div>
+        <div><b>${seats}</b><span>${t("reservedSeats")}</span></div>
+        <div><b>${conf}</b><span>${t("confirmedAtt")}</span></div>
+        <div><b>${arrived}</b><span>${t("arrived")}</span></div>
+      </div>
+      <div class="bar" aria-hidden="true">${STATUSES.map(x => counts[x] ? `<i style="width:${counts[x] / total * 100}%;background:${STATUS_COLOR[x]}"></i>` : "").join("")}</div>
+      <div class="chips" role="group">
+        <button class="chip" data-f="all" aria-pressed="${filter === "all"}">${t("all")} <em>${all.length}</em></button>
+        ${STATUSES.map(x => `<button class="chip" data-f="${x}" aria-pressed="${filter === x}"><span class="dot" style="background:${STATUS_COLOR[x]}"></span>${t("st_" + x)} <em>${counts[x]}</em></button>`).join("")}
+      </div>`;
+  }
+  function renderList() {
+    const el = $("#a-list"); if (!el) return;
+    if (!S.allLoaded) { el.innerHTML = `<div class="empty muted">${t("loading")}</div>`; return; }
+    const all = [...S.invites.values()].sort((a, b) => String(a.id).localeCompare(String(b.id)));
+    if (!all.length) {
+      el.innerHTML = `<div class="empty"><h2>${t("noInv")}</h2><p>${t("noInvSub")}</p><div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button class="btn" data-a="import">${ICON.up}${t("importList")}</button><button class="btn gold" data-a="add">${ICON.plus}${t("addInv")}</button></div></div>`;
+      return;
+    }
+    const rows = all.filter(i => (filter === "all" || statusOf(i) === filter) && (!q || [i.name, i.id, i.phone, i.notes].join(" ").toLowerCase().includes(q)));
+    if (!rows.length) { el.innerHTML = `<div class="empty muted">${t("noMatch")}</div>`; return; }
+    el.innerHTML = rows.map(i => {
+      const st = statusOf(i), a = attending(i), ro = !S.canWrite;
+      return `<div class="row" data-tok="${esc(i.token)}">
+        <div class="who"><b>${esc(i.name)}</b><span>${esc(i.id)}${i.phone ? " | " + esc(i.phone) : ""}${i.notes ? " | " + esc(i.notes) : ""}</span></div>
+        <div class="seats"><b>${a ?? "–"}</b> <small>/ ${i.seats}</small></div>
+        <div class="st">${pill(st)}</div>
+        <div class="acts">
+          <button class="btn sm" data-r="msg" title="${t("copyMsg")}">${ICON.msg}<span class="lbl">${t("copyMsg")}</span></button>
+          <button class="btn sm icon" data-r="link" title="${t("copyLink")}" aria-label="${t("copyLink")}">${ICON.link}</button>
+          <details class="menu"><summary class="btn sm icon" aria-label="…">${ICON.more}</summary><div class="menu-pop">
+            <a data-r="wa" href="${esc(waLink(i))}" target="_blank" rel="noopener">${ICON.wa}${t("openWa")}</a>
+            <button data-r="qr">${ICON.qr}${t("downloadQr")}</button>
+            <button data-r="preview">${ICON.eye}${t("preview")}</button>
+            <button data-r="checkin">${ICON.scan}${t("checkinPage")}</button>
+            ${ro ? "" : `<hr><button data-r="edit">${ICON.edit}${t("edit")}</button>
+            <button data-r="reset">${ICON.reset}${t("resetRsvp")}</button>
+            ${i.checkedInAt ? `<button data-r="undo">${ICON.undo}${t("undoCheckin")}</button>` : ""}
+            <button data-r="del" class="danger">${ICON.trash}${t("del")}</button>`}
+          </div></details>
+        </div></div>`;
+    }).join("");
+  }
+  async function markSent(inv) { if (!inv.sentAt && S.canWrite) { try { await patchInvite(inv.token, { sentAt: new Date().toISOString() }); } catch (e) {} } }
+  async function onClick(e) {
+    const f = e.target.closest("[data-f]"); if (f) { filter = f.dataset.f; renderOverview(); renderList(); return; }
+    const a = e.target.closest("[data-a]");
+    if (a) { const x = a.dataset.a; if (x === "add") editDialog(); if (x === "import") importDialog(); if (x === "settings") settingsDialog(); if (x === "export") exportCsv(); if (x === "signout") S.sb.auth.signOut(); if (x === "send") sendQueue(); return; }
+    const r = e.target.closest("[data-r]"); if (!r) return;
+    const tok = r.closest("[data-tok]").dataset.tok, inv = S.invites.get(tok); if (!inv) return;
+    const d = r.closest("details"); if (d) d.removeAttribute("open");
+    try {
+      switch (r.dataset.r) {
+        case "msg": if (await copyText(messageFor(inv))) { toast(t("msgCopied")); markSent(inv); } break;
+        case "link": if (await copyText(linkFor(inv))) toast(t("linkCopied")); break;
+        case "wa": markSent(inv); break;
+        case "qr": deliver(`${inv.id}-qr.png`, await qrPngBlob(inv)); break;
+        case "preview": location.hash = `#/preview/${inv.token}`; break;
+        case "checkin": location.hash = `#/checkin/${inv.token}`; break;
+        case "edit": editDialog(inv); break;
+        case "reset": if (await confirmDialog(t("confirmReset", { name: inv.name }), t("resetRsvp"))) { await patchInvite(tok, { rsvp: null }); toast(t("resetDone")); } break;
+        case "undo": if (await confirmDialog(t("confirmUndo", { name: inv.name }), t("undoCheckin"))) { await patchInvite(tok, { checkedInAt: null }); toast(t("undoDone")); } break;
+        case "del": if (await confirmDialog(t("confirmDelete", { name: inv.name }), t("del"), true)) { await removeInvite(tok); toast(t("deleted")); } break;
+      }
+    } catch (err) { writeFailed(err); }
+  }
+  return { mount, update, unmount };
+}
+
+function waDialog(inv, onSent) {
+  const msg = messageFor(inv), num = waNumber(inv.phone);
+  const url = "https://api.whatsapp.com/send?" + (num ? "phone=" + num + "&" : "") + "text=" + encodeURIComponent(msg);
+  openDialog(`<h2>${t("openWa")}</h2>
+    <p class="muted" style="margin-top:0">${esc(inv.name)}${num ? " | +" + esc(num) : " | " + esc(t("waNoPhone"))}</p>
+    <pre style="white-space:pre-wrap;background:var(--bg);border-radius:10px;padding:12px;font:inherit;font-size:14px;max-height:220px;overflow:auto;margin:0 0 6px" dir="auto">${esc(msg)}</pre>
+    <p class="muted" style="font-size:13px;margin:0 0 12px">${t("waHelp")}</p>
+    <div class="dlg-acts"><button class="btn" data-x="copy">${ICON.copy}${t("copyMsg")}</button>
+    <a class="btn gold" data-x="open" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${ICON.wa}${t("waOpenBtn")}</a></div>`, d => {
+    $('[data-x="copy"]', d).onclick = async () => { if (await copyText(msg)) { toast(t("msgCopied")); onSent(); } };
+    $('[data-x="open"]', d).onclick = () => { onSent(); setTimeout(closeDialog, 300); };
+  });
+}
+
+function sendQueue(includeSent) {
+  const queue = [...S.invites.values()].filter(i => includeSent || !i.sentAt).sort((a, b) => String(a.id).localeCompare(String(b.id))).map(i => i.token);
+  let pos = 0;
+  const show = () => {
+    if (!queue.length) {
+      openDialog(`<h2>${t("q_title")}</h2><p>${t("q_none")}</p><div class="dlg-acts"><button class="btn" data-x="all">${t("q_resend")}</button><button class="btn primary" data-x="c">${t("q_close")}</button></div>`, d => {
+        $('[data-x="c"]', d).onclick = closeDialog; $('[data-x="all"]', d).onclick = () => sendQueue(true); });
+      return;
+    }
+    while (pos < queue.length && !S.invites.has(queue[pos])) pos++;
+    if (pos >= queue.length) {
+      openDialog(`<h2>${t("q_done")}</h2><p class="muted">${t("q_doneSub")}</p><div class="dlg-acts"><button class="btn primary" data-x="c">${t("q_close")}</button></div>`, d => { $('[data-x="c"]', d).onclick = closeDialog; });
+      return;
+    }
+    const inv = S.invites.get(queue[pos]), hasPhone = !!waNumber(inv.phone);
+    openDialog(`<h2>${t("q_title")}</h2>
+      <div class="q-prog"><i style="width:${pos / queue.length * 100}%"></i></div>
+      <p class="muted" style="margin:0;font-size:14px">${t("q_of", { i: pos + 1, n: queue.length })}. ${t("q_help")}</p>
+      <div class="q-card"><b>${esc(inv.name)}</b>
+        <span class="muted" style="font-size:14px">${esc(inv.id)} | ${t("reservedSeats")}: ${inv.seats}${hasPhone ? ` | <span dir="ltr">${esc(inv.phone)}</span>` : ""}</span>
+        ${hasPhone ? "" : `<p style="margin:8px 0 0;font-size:14px;color:var(--amber)">${t("q_noPhone")}</p>`}
+        <details style="margin-top:8px"><summary style="cursor:pointer;font-size:14px">${t("q_showMsg")}</summary><div class="q-msg">${esc(messageFor(inv))}</div></details>
+      </div>
+      <a class="btn wa-btn" id="q-open" href="${esc(waLink(inv))}" target="_blank" rel="noopener">${ICON.wa}${hasPhone ? t("q_open") : t("q_pick")}</a>
+      <div class="dlg-acts" style="margin-top:12px"><button class="btn" data-x="copy">${ICON.copy}${t("copyMsg")}</button><span style="flex:1"></span><button class="btn ghost" data-x="skip">${t("q_skip")}</button><button class="btn" data-x="c">${t("q_close")}</button></div>`, d => {
+      $('[data-x="c"]', d).onclick = closeDialog;
+      $('[data-x="skip"]', d).onclick = () => { pos++; show(); };
+      $('[data-x="copy"]', d).onclick = async () => { if (await copyText(messageFor(inv))) toast(t("msgCopied")); };
+      $("#q-open", d).addEventListener("click", () => {
+        if (!inv.sentAt && S.canWrite) patchInvite(inv.token, { sentAt: new Date().toISOString() }).catch(() => {});
+        pos++; setTimeout(show, 400);
+      });
+    });
+  };
+  show();
+}
+
+function editDialog(inv) {
+  const isNew = !inv;
+  openDialog(`<h2>${isNew ? t("addInv") : t("edit")}</h2><form id="ef">
+    <label class="field"><span>${t("f_name")}</span><input name="name" required maxlength="120" value="${esc(inv?.name)}"></label>
+    <label class="field"><span>${t("f_seats")}</span><input name="seats" type="number" inputmode="numeric" min="1" max="99" required value="${esc(inv?.seats ?? 2)}"></label>
+    <label class="field"><span>${t("f_phone")}</span><input name="phone" type="tel" dir="ltr" value="${esc(inv?.phone)}"></label>
+    <label class="field"><span>${t("f_notes")}</span><input name="notes" maxlength="300" value="${esc(inv?.notes)}"></label>
+    <div class="dlg-acts"><button type="button" class="btn" data-x="c">${t("cancel")}</button><button class="btn primary">${t("save")}</button></div></form>`, d => {
+    $('[data-x="c"]', d).onclick = closeDialog;
+    $("#ef", d).onsubmit = async e => {
+      e.preventDefault(); const fd = new FormData(e.target);
+      const seats = Math.max(1, Math.min(99, parseInt(fd.get("seats"), 10) || 1));
+      const base = { name: String(fd.get("name")).trim(), seats, phone: String(fd.get("phone")).trim(), notes: String(fd.get("notes")).trim() };
+      if (!base.name) return;
+      try {
+        if (isNew) { const token = newToken(); await putInvite({ token, id: fmtId(nextIdNum()), ...base, createdAt: new Date().toISOString(), sentAt: null, viewedAt: null, rsvp: null, checkedInAt: null }); toast(t("added")); }
+        else {
+          const patch = { ...base }; const a = attending(inv);
+          if (a != null && a > seats) patch.rsvp = { ...inv.rsvp, count: seats };
+          await patchInvite(inv.token, patch); toast(t("saved"));
+        }
+        closeDialog();
+      } catch (err) { writeFailed(err); }
+    };
+  });
+}
+
+function settingsDialog() {
+  const s = S.settings;
+  openDialog(`<h2>${t("settings")}</h2><form id="sf">
+    <label class="field"><span>${t("s_coupleEn")}</span><input name="coupleEn" dir="ltr" placeholder="Sara & Omar" value="${esc(s.coupleEn)}"></label>
+    <label class="field"><span>${t("s_coupleAr")}</span><input name="coupleAr" dir="rtl" placeholder="سارة وعمر" value="${esc(s.coupleAr)}"></label>
+    <label class="field"><span>${t("s_deadline")}</span><input name="deadline" type="datetime-local" value="${esc(s.deadline)}"></label>
+    <label class="field"><span>${t("s_base")}</span><input name="baseUrl" dir="ltr" type="url" value="${esc(s.baseUrl)}"><small>${t("s_baseHelp")}</small></label>
+    <label class="field"><span>${t("s_msgLang")}</span><select name="msgLang">
+      <option value="both" ${s.msgLang === "both" ? "selected" : ""}>${t("both")}</option>
+      <option value="ar" ${s.msgLang === "ar" ? "selected" : ""}>${t("arabic")}</option>
+      <option value="en" ${s.msgLang === "en" ? "selected" : ""}>${t("english")}</option></select></label>
+    <div class="dlg-acts"><button type="button" class="btn" data-x="c">${t("cancel")}</button><button class="btn primary" ${S.canWrite ? "" : "disabled"}>${t("save")}</button></div></form>`, d => {
+    $('[data-x="c"]', d).onclick = closeDialog;
+    $("#sf", d).onsubmit = async e => {
+      e.preventDefault(); const fd = new FormData(e.target), n = {};
+      ["coupleEn", "coupleAr", "deadline", "baseUrl", "msgLang"].forEach(k => n[k] = String(fd.get(k) || "").trim());
+      if (!n.baseUrl) n.baseUrl = DEFAULT_SETTINGS.baseUrl;
+      try { await putSettings({ ...DEFAULT_SETTINGS, ...n }); toast(t("saved")); closeDialog(); } catch (err) { writeFailed(err); }
+    };
+  });
+}
+
+/* ---------- import / export ---------- */
+const HEAD = {
+  name: ["family", "guest", "name", "اسم", "الاسم", "العائلة", "الضيف"],
+  seats: ["seat", "reserved", "count", "مقاعد", "المقاعد", "عدد"],
+  phone: ["phone", "mobile", "whatsapp", "جوال", "الجوال", "هاتف", "رقم"],
+  notes: ["note", "ملاحظ"]
+};
+function mapHeader(row) {
+  const idx = {}; row.forEach((h, i) => {
+    const s = String(h ?? "").toLowerCase();
+    for (const k of ["seats", "phone", "notes", "name"]) if (idx[k] == null && HEAD[k].some(w => s.includes(w))) { idx[k] = i; break; }
+  });
+  return idx.name != null ? idx : null;
+}
+function parseRows(aoa) {
+  aoa = aoa.filter(r => r && r.some(c => String(c ?? "").trim() !== ""));
+  if (!aoa.length) return { ok: [], bad: [] };
+  let idx = mapHeader(aoa[0]), start = 1;
+  if (!idx) { idx = { name: 0, seats: 1, phone: 2, notes: 3 }; start = 0; }
+  const ok = [], bad = [];
+  for (let r = start; r < aoa.length; r++) {
+    const row = aoa[r], name = String(row[idx.name] ?? "").trim(), seatsRaw = String(row[idx.seats] ?? "").trim().replace(/[\u0660-\u0669]/g, d => d.charCodeAt(0) - 0x0660).replace(/[\u06F0-\u06F9]/g, d => d.charCodeAt(0) - 0x06F0), mNum = seatsRaw.match(/\d+(\.0+)?/), seats = mNum ? Number(mNum[0]) : NaN;
+    if (!name) { bad.push(`${t("row")} ${r + 1}: ${t("why_name")}`); continue; }
+    if (!Number.isInteger(seats) || seats < 1) { bad.push(`${t("row")} ${r + 1}: ${t("why_seats")}`); continue; }
+    ok.push({ name, seats: Math.min(seats, 99), phone: idx.phone != null ? String(row[idx.phone] ?? "").trim() : "", notes: idx.notes != null ? String(row[idx.notes] ?? "").trim() : "" });
+  }
+  return { ok, bad };
+}
+function importDialog() {
+  let parsed = null;
+  openDialog(`<h2>${t("imp_title")}</h2><p class="muted" style="margin-top:0">${t("imp_help")}</p>
+    <label class="drop"><input type="file" id="imf" class="sr" accept=".xlsx,.xls,.csv">${ICON.up.replace("<svg", '<svg style="width:28px;height:28px;color:var(--gold)"')}<div style="margin-top:6px;font-weight:500" id="imname">${t("imp_choose")}</div></label>
+    <div id="imrep" class="report"></div>
+    <div class="dlg-acts"><button class="btn ghost" data-x="tpl">${ICON.dl}${t("imp_template")}</button><span style="flex:1"></span><button class="btn" data-x="c">${t("cancel")}</button><button class="btn primary" data-x="go" disabled>${t("imp_go", { n: 0 })}</button></div>`, d => {
+    $('[data-x="c"]', d).onclick = closeDialog;
+    $('[data-x="tpl"]', d).onclick = () => deliver("guest-list-template.csv", new Blob(["\uFEFFFamily / Guest Name,Reserved Seats,Phone Number,Notes\nAl-Harbi Family,7,0551234567,Groom's side\nNoura Al-Qahtani,1,,\n"], { type: "text/csv" }));
+    $("#imf", d).onchange = async e => {
+      const file = e.target.files[0]; if (!file) return; $("#imname", d).textContent = file.name;
+      try {
+        const wb = XLSX.read(await file.arrayBuffer(), { type: "array" });
+        parsed = parseRows(XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, raw: false, defval: "" }));
+      } catch (err) { parsed = { ok: [], bad: [String(err.message || err)] }; }
+      $("#imrep", d).innerHTML = `<p style="color:var(--ink);font-weight:500;margin:0 0 4px">${t("imp_ready", { n: parsed.ok.length })}</p>${parsed.bad.length ? `<p style="margin:0 0 4px">${t("imp_skipped", { n: parsed.bad.length })}</p>` + parsed.bad.map(b => `<div>${esc(b)}</div>`).join("") : ""}`;
+      const go = $('[data-x="go"]', d); go.disabled = !parsed.ok.length || !S.canWrite; go.textContent = t("imp_go", { n: parsed.ok.length });
+      if (!S.canWrite) $("#imrep", d).insertAdjacentHTML("beforeend", `<p style="color:var(--bad);margin:8px 0 0">${esc(t("notAdmin"))}</p>`);
+      else if (!parsed.ok.length) $("#imrep", d).insertAdjacentHTML("beforeend", `<p style="color:var(--bad);margin:8px 0 0">${esc(t("imp_none"))}</p>`);
+    };
+    $('[data-x="go"]', d).onclick = async ev => {
+      const go = ev.currentTarget; go.disabled = true; let n = nextIdNum(), done = 0; const now = new Date().toISOString();
+      const items = parsed.ok.map(r => ({ token: newToken(), id: fmtId(n++), ...r, createdAt: now, sentAt: null, viewedAt: null, rsvp: null, checkedInAt: null }));
+      try {
+        await putInvites(items, n2 => { done = n2; go.textContent = t("imp_working", { i: n2, n: items.length }); });
+        toast(t("imp_done", { n: done })); closeDialog();
+      } catch (err) { writeFailed(err); toast(t("imp_done", { n: done })); }
+    };
+  });
+}
+function exportCsv() {
+  const q = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
+  const head = ["Invitation ID", "Family / Guest Name", "Reserved Seats", "Confirmed Attendees", "Status", "Checked In At", "Phone Number", "Notes", "RSVP Link"];
+  const lines = [...S.invites.values()].sort((a, b) => String(a.id).localeCompare(String(b.id))).map(i => [i.id, i.name, i.seats, attending(i) ?? "", T.en["st_" + statusOf(i)], i.checkedInAt || "", i.phone, i.notes, linkFor(i)].map(q).join(","));
+  deliver("wedding-rsvp.csv", new Blob(["\uFEFF" + [head.map(q).join(","), ...lines].join("\n")], { type: "text/csv" }));
+}
+
+/* ======================= GUEST ======================= */
+function GuestView(r) {
+  let editing = false, choice = "", busy = false, justSaved = false, err = "", viewedMarked = false;
+  function mount() { if (!S.oneLoaded[r.token]) loadGuest(r.token, !r.preview); app.addEventListener("click", onClick); app.addEventListener("change", onChange); update(); }
+  function unmount() { app.removeEventListener("click", onClick); app.removeEventListener("change", onChange); }
+  const loaded = () => !!S.oneLoaded[r.token];
+  function update() {
+    const top = `<div class="g-top">${r.preview ? `<a class="btn ghost sm" href="./#/">${ICON.back}${t("back")}</a>` : S.session ? `<a class="btn ghost sm" href="./#/checkin/${encodeURIComponent(r.token)}">${ICON.scan}${t("checkinPage")}</a>` : "<span></span>"}${langBtn()}</div>`;
+    if (!loaded()) { app.innerHTML = `<main class="guest">${top}<div class="loading">${t("loading")}</div></main>`; return; }
+    if (S.guestErr[r.token]) { app.innerHTML = `<main class="guest">${top}<section class="arch"><p class="inv">${t("g_loadErr")}</p><button class="btn primary" data-g="retry">${t("retry")}</button></section></main>`; return; }
+    const inv = S.invites.get(r.token);
+    if (!inv) { app.innerHTML = `<main class="guest">${top}<section class="arch"><p class="dear">${t("g_notFound")}</p><p class="inv">${t("g_notFoundSub")}</p></section></main>`; return; }
+    const s = S.settings, couple = LANG === "ar" ? (s.coupleAr || s.coupleEn) : (s.coupleEn || s.coupleAr), closed = deadlinePassed(), a = attending(inv);
+    const header = `
+      ${r.preview ? `<div class="notice gold" style="font-size:14px">${esc(t("g_preview", { name: inv.name }))}</div>` : ""}
+      <section class="arch">
+        ${couple ? `<p class="names">${esc(couple)}</p>` : ""}
+        <div class="orn" aria-hidden="true"><i></i><b></b><i></i></div>
+        <p class="dear">${esc(t("dear", { name: inv.name }))}</p>
+        <p class="inv">${couple ? esc(t("inviteOf", { c: couple })) : t("inviteLine")}</p>
+        <dl class="facts"><div><dt>${t("reservedSeats")}</dt><dd>${inv.seats}</dd></div>${s.deadline ? `<div><dt>${t("replyBy")}</dt><dd>${esc(fmtDate(s.deadline, LANG, false))}</dd></div>` : ""}</dl>
+      </section>`;
+    let body;
+    if (a != null && !editing) body = confirmation(inv, a, closed);
+    else if (closed) body = `<div class="g-card"><p style="margin:0;text-align:center">${esc(t("g_closedNo", { date: fmtDate(s.deadline) }))}</p></div>`;
+    else body = form(inv, a);
+    app.innerHTML = `<main class="guest">${top}${header}${body}</main>`;
+    justSaved = false;
+  }
+  function form(inv, a) {
+    const errHtml = err ? `<p style="color:var(--bad);margin:10px 0 0;font-size:15px">${esc(err)}</p>` : "";
+    const keep = a != null ? `<p class="g-foot"><button class="linkbtn" data-g="keep">${t("g_keep")}</button></p>` : "";
+    if (inv.seats === 1) return `<div class="g-card"><div class="choice">
+        <button class="btn primary" data-g="yes" ${busy ? "disabled" : ""}>${t("g_yes")}</button>
+        <button class="btn" data-g="no" ${busy ? "disabled" : ""}>${t("g_no")}</button></div>${errHtml}</div>${keep}`;
+    const cur = choice !== "" ? choice : (a != null ? String(a) : "");
+    let opts = `<option value="" disabled ${cur === "" ? "selected" : ""}>${t("g_choose")}</option><option value="0" ${cur === "0" ? "selected" : ""}>${t("g_zero")}</option>`;
+    for (let i = 1; i <= inv.seats; i++) opts += `<option value="${i}" ${cur === String(i) ? "selected" : ""}>${i}</option>`;
+    return `<div class="g-card"><h2 id="howlbl">${t("g_how")}</h2>
+      <select class="g-select" id="g-count" aria-labelledby="howlbl">${opts}</select>
+      <button class="btn primary big" data-g="send" ${cur === "" || busy ? "disabled" : ""}>${t("g_send")}</button>${errHtml}</div>${keep}`;
+  }
+  function confirmation(inv, a, closed) {
+    const s = S.settings, link = linkFor(inv);
+    const qr = a > 0 ? `<div class="qrbox"><h3>${t("g_qrTitle")}</h3><div class="qr">${qrSvg(link)}</div><p class="muted" style="margin:0 0 14px">${t("g_qrHelp")}</p>
+      <div class="qr-acts"><button class="btn" data-g="dlqr">${ICON.dl}${t("downloadQr")}</button><button class="btn" data-g="saveimg">${ICON.img}${t("g_saveImg")}</button></div></div>` : "";
+    const foot = closed ? `<p class="g-foot">${esc(t("g_closed", { date: fmtDate(s.deadline) }))}</p>`
+      : `<p class="g-foot"><button class="linkbtn" data-g="change">${t("g_change")}</button>${s.deadline ? `<br>${esc(t("g_canChange", { date: fmtDate(s.deadline) }))}` : ""}</p>`;
+    return `<div class="g-card done ${justSaved ? "animate" : ""}">
+      <svg class="tick" viewBox="0 0 60 60" aria-hidden="true"><circle cx="30" cy="30" r="28"/><path d="M18 31l8 8 16-17"/></svg>
+      <h2>${t("g_thanks")}</h2><p>${t("g_recorded")}</p>
+      <div class="counts"><div><b>${a}</b><span>${t("confirmedAtt")}</span></div><div><b>${inv.seats}</b><span>${t("reservedSeats")}</span></div></div>
+      <p style="font-family:var(--display);font-size:20px">${a > 0 ? t("g_look") : t("g_miss")}</p>
+      ${qr}</div>${foot}`;
+  }
+  async function submit(count) {
+    const inv = S.invites.get(r.token); if (!inv || busy) return;
+    if (deadlinePassed()) { update(); return; }
+    busy = true; err = ""; update();
+    const { data, error } = await S.sb.rpc("submit_rsvp", { p_token: inv.token, p_count: count });
+    busy = false;
+    if (error) {
+      if (/RSVP_CLOSED/.test(error.message || "")) { editing = false; await loadGuest(r.token, false); return; }
+      err = t("g_saveErr"); update(); return;
+    }
+    setGuestData(r.token, data); editing = false; choice = ""; justSaved = true; update();
+  }
+  async function onClick(e) {
+    const g = e.target.closest("[data-g]"); if (!g) return; const inv = S.invites.get(r.token);
+    switch (g.dataset.g) {
+      case "retry": S.oneLoaded[r.token] = false; update(); loadGuest(r.token, !r.preview); break;
+      case "yes": submit(1); break;
+      case "no": submit(0); break;
+      case "send": { const v = $("#g-count")?.value; if (v !== "" && v != null) submit(parseInt(v, 10)); break; }
+      case "change": editing = true; choice = ""; update(); break;
+      case "keep": editing = false; choice = ""; err = ""; update(); break;
+      case "dlqr": deliver(`${inv.id}-entry-qr.png`, await qrPngBlob(inv)); break;
+      case "saveimg": deliver(`${inv.id}-entry-pass.png`, await passPngBlob(inv)); break;
+    }
+  }
+  function onChange(e) { if (e.target.id === "g-count") { choice = e.target.value; const b = $('[data-g="send"]'); if (b) b.disabled = choice === ""; } }
+  return { mount, update, unmount };
+}
+
+/* ======================= SCAN ======================= */
+function findInvite(text) {
+  let s = String(text || "").trim(); if (!s) return null;
+  try { const u = new URL(s); const qi = u.searchParams.get("i"); if (qi) s = qi; else { const parts = u.pathname.split("/").filter(Boolean); if (parts.length) s = parts[parts.length - 1]; } } catch (e) {
+    const parts = s.split(/[\/#?]/).filter(Boolean); if (parts.length) s = parts[parts.length - 1];
+  }
+  if (S.invites.has(s)) return S.invites.get(s);
+  const low = s.toLowerCase(), num = parseInt(low.replace(/\D/g, ""), 10);
+  for (const i of S.invites.values()) { if (String(i.id).toLowerCase() === low) return i; if (num && /^(inv-?)?\d+$/.test(low) && parseInt(String(i.id).replace(/\D/g, ""), 10) === num) return i; }
+  return null;
+}
+function ScanView() {
+  let stream = null, raf = 0, alive = true;
+  function mount() {
+    ensureAll();
+    app.innerHTML = `<main class="station"><div class="g-top"><a class="btn ghost sm" href="#/">${ICON.back}${t("back")}</a>${langBtn()}</div>
+      <h1>${t("c_title")}</h1><p class="muted" style="margin:0">${t("c_help")}</p>
+      <div class="cam" id="cam"><video id="vid" playsinline muted></video><div class="frame" aria-hidden="true"></div><p id="camMsg" hidden></p></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <button class="btn" id="startCam">${ICON.scan}${t("c_startCam")}</button>
+        <label class="btn" style="cursor:pointer">${ICON.img}${t("c_photo")}<input type="file" id="photo" accept="image/*" capture="environment" class="sr"></label>
+      </div>
+      <form class="manual" id="manual"><input id="manualIn" placeholder="${t("c_manual")}" dir="ltr" autocomplete="off" aria-label="${t("c_manual")}"><button class="btn primary">${t("c_find")}</button></form>
+    </main>`;
+    $("#startCam").onclick = start;
+    $("#photo").onchange = scanPhoto;
+    $("#manual").onsubmit = e => { e.preventDefault(); go($("#manualIn").value); };
+    start();
+  }
+  function camMsg(m) { const p = $("#camMsg"); if (p) { p.hidden = !m; p.textContent = m || ""; } }
+  async function start() {
+    stop();
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false });
+      if (!alive) { stop(); return; }
+      const v = $("#vid"); v.srcObject = stream; await v.play(); camMsg(""); loop();
+    } catch (e) { camMsg(t("c_cameraOff")); }
+  }
+  const cv = document.createElement("canvas"), cx = cv.getContext("2d", { willReadFrequently: true });
+  function loop() {
+    const v = $("#vid"); if (!alive || !v) return;
+    if (v.readyState >= 2 && v.videoWidth) {
+      const scale = Math.min(1, 720 / Math.max(v.videoWidth, v.videoHeight));
+      cv.width = v.videoWidth * scale; cv.height = v.videoHeight * scale; cx.drawImage(v, 0, 0, cv.width, cv.height);
+      const code = jsQR(cx.getImageData(0, 0, cv.width, cv.height).data, cv.width, cv.height, { inversionAttempts: "dontInvert" });
+      if (code && code.data) { if (go(code.data, true)) return; }
+    }
+    raf = requestAnimationFrame(loop);
+  }
+  let lastBad = "";
+  function go(text, fromCam) {
+    if (!S.allLoaded && S.mode === "db") { toast(t("loading")); return false; }
+    const inv = findInvite(text);
+    if (!inv) { if (!fromCam || text !== lastBad) toast(t("c_notFound")); lastBad = text; return false; }
+    if (navigator.vibrate) try { navigator.vibrate(60); } catch (e) {}
+    location.hash = "#/checkin/" + inv.token; return true;
+  }
+  function scanPhoto(e) {
+    const f = e.target.files[0]; if (!f) return; const img = new Image();
+    img.onload = () => {
+      const scale = Math.min(1, 1400 / Math.max(img.width, img.height)); cv.width = img.width * scale; cv.height = img.height * scale;
+      cx.drawImage(img, 0, 0, cv.width, cv.height); const code = jsQR(cx.getImageData(0, 0, cv.width, cv.height).data, cv.width, cv.height);
+      URL.revokeObjectURL(img.src); if (code && code.data) go(code.data); else toast(t("c_noQr"));
+    };
+    img.src = URL.createObjectURL(f); e.target.value = "";
+  }
+  function stop() { cancelAnimationFrame(raf); if (stream) { stream.getTracks().forEach(tr => tr.stop()); stream = null; } }
+  function unmount() { alive = false; stop(); }
+  return { mount, unmount, update() {} };
+}
+
+/* ======================= CHECK-IN ======================= */
+function CheckinView(r) {
+  let busy = false, fresh = false;
+  function mount() { ensureAll(); app.addEventListener("click", onClick); update(); }
+  function unmount() { app.removeEventListener("click", onClick); }
+  function update() {
+    const top = `<div class="g-top"><a class="btn ghost sm" href="#/">${ICON.back}${t("back")}</a>${langBtn()}</div>`;
+    if (!S.allLoaded) { app.innerHTML = `<main class="station">${top}<div class="loading">${t("loading")}</div></main>`; return; }
+    const inv = S.invites.get(r.token);
+    if (!inv) { app.innerHTML = `<main class="station">${top}<div class="ci"><p class="nm" style="font-size:26px">${t("c_notFound")}</p></div><p style="margin-top:14px"><a class="btn primary big" href="#/scan">${ICON.scan}${t("c_next")}</a></p></main>`; return; }
+    const st = statusOf(inv), a = attending(inv), rsvpSt = a == null ? "noReply" : (a === 0 ? "declined" : a < inv.seats ? "partial" : "confirmed");
+    const warn = a == null ? t("c_noRsvp") : a === 0 ? t("c_declined") : "";
+    const action = inv.checkedInAt
+      ? `<div class="already"><b>${fresh ? t("c_done") : t("c_already")}</b><div>${t("c_date")}: ${esc(fmtDay(inv.checkedInAt))}</div><div>${t("c_time")}: ${esc(fmtTime(inv.checkedInAt))}</div></div>`
+      : `${warn ? `<div class="warn">${esc(warn)}</div>` : ""}<button class="btn gold checkin-btn" data-c="in" ${busy || !S.canWrite ? "disabled" : ""}>${ICON.scan}${t("c_checkIn")}</button>`;
+    app.innerHTML = `<main class="station">${top}<div class="ci">
+      <p class="muted" style="margin:0">${t("inviteId")} ${esc(inv.id)}</p>
+      <p class="nm">${esc(inv.name)}</p>
+      <dl>
+        <div><dt>${t("reservedSeats")}</dt><dd>${inv.seats}</dd></div>
+        <div><dt>${t("confirmedAtt")}</dt><dd>${a ?? "–"}</dd></div>
+        <div><dt>${t("c_status")}</dt><dd>${rsvpSt === "noReply" ? `<span class="pill draft">${t("noReply")}</span>` : pill(rsvpSt)}</dd></div>
+        <div><dt>${t("c_check")}</dt><dd>${inv.checkedInAt ? pill("checkedin") : `<span class="pill draft">${t("c_notYet")}</span>`}</dd></div>
+      </dl>${action}</div>
+      <p style="margin-top:14px"><a class="btn primary big" href="#/scan">${ICON.scan}${t("c_next")}</a></p></main>`;
+  }
+  async function onClick(e) {
+    if (!e.target.closest('[data-c="in"]') || busy) return;
+    busy = true; update();
+    try {
+      const { data, error } = await S.sb.rpc("check_in", { p_token: r.token });
+      if (error) throw error;
+      const cur = S.invites.get(r.token); if (cur) S.invites.set(r.token, { ...cur, checkedInAt: data.checked_in_at });
+      fresh = !data.already;
+    } catch (err) { writeFailed(err); }
+    busy = false; update();
+  }
+  return { mount, update, unmount };
+}
+
+init();
+</script>
+</body>
+</html>
