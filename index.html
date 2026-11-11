@@ -1067,7 +1067,7 @@ function AdminView() {
     if (S.subs.all) loadAll();
     ensureAll();
     app.innerHTML = `<div class="wrap">
-      <header class="top"><h1 id="a-title"></h1><small class="muted" style="font-size:11px;align-self:center" title="page version">v11-11-2050b</small><div class="actions">
+      <header class="top"><h1 id="a-title"></h1><small class="muted" style="font-size:11px;align-self:center" title="page version">v11-11-2100</small><div class="actions">
         ${langBtn()}
         <button class="btn icon" data-a="theme" id="a-theme" title="${t("th_toggle")}" aria-label="${t("th_toggle")}">${dashDark() ? "☀️" : "🌙"}</button>
         <button class="btn ghost sm" data-a="signout">${t("signOut")}</button>
@@ -2201,7 +2201,7 @@ function dateBlock(iso) {
 }
 function countdownHtml(iso) {
   if (!iso) return "";
-  const p = countdownParts(iso);
+  const p = countdownParts(iso) || { d: 0, h: 0, m: 0, s: 0 };   // after the time: stays at 00 00 00 00, no message
   const body = p ? `<div class="cd-grid" role="timer" aria-live="off" dir="${LANG === "ar" ? "rtl" : "ltr"}">
       <div><b data-cd="d">${cdNum(p.d)}</b><span>${t("cd_d")}</span></div><div><b data-cd="h">${cdNum(p.h)}</b><span>${t("cd_h")}</span></div>
       <div><b data-cd="m">${cdNum(p.m)}</b><span>${t("cd_m")}</span></div><div><b data-cd="s">${cdNum(p.s)}</b><span>${t("cd_s")}</span></div></div>`
@@ -2210,8 +2210,7 @@ function countdownHtml(iso) {
 }
 function tickCountdown() {
   const box = document.querySelector("[data-cd-at]"); if (!box) return;
-  const p = countdownParts(box.dataset.cdAt);
-  if (!p) { if (!box.querySelector(".cd-now")) box.outerHTML = countdownHtml(box.dataset.cdAt); return; }
+  const p = countdownParts(box.dataset.cdAt) || { d: 0, h: 0, m: 0, s: 0 };
   for (const k of ["d", "h", "m", "s"]) { const el = box.querySelector(`[data-cd="${k}"]`); const v = cdNum(p[k]); if (el && el.textContent !== v) el.textContent = v; }
 }
 const ART = {
